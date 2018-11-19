@@ -1,0 +1,16 @@
+### Behavior-based, (c) openba
+
+# configure your honey accounts ahead of time, should never be accessed/used in SPNs normally
+$honeyaccount:
+  admin_ho
+$1:
+index=Windows_Event_Logs and EventType=AUDIT_SUCCESS and EventID = 4769 AND AccountName NOT CONTAINS $@ and TicketEncryptionType CONTAINS 0x17 AND AccountName NOT CONTAINS "krbtgt" AND ServiceName NOT CONTAINS $ and AND ServiceName NOT CONTAINS krbtgt AND ClientAddress NOT CONTAINS "::1" | high_count by ClientAddress compared to self period 1m;
+$2:
+index=Windows_Event_Logs and EventType=AUDIT_SUCCESS and EventID = 4769 AND AccountName NOT CONTAINS $@ and TicketEncryptionType CONTAINS 0x17 AND AccountName NOT CONTAINS "krbtgt" AND ServiceName NOT CONTAINS $ and AND ServiceName NOT CONTAINS krbtgt AND ClientAddress NOT CONTAINS "::1" | high_count by AccountName compared to self period 1m;
+$3:
+index=Windows_Event_Logs and EventID = 4738 and EventType=AUDIT_SUCCESS and Changed_Attributes=“SAM"
+$4:
+index=Windows_Event_Logs and EventID = 4769 and TicketEncryption CONTAINS 0x17 AND AccountName CONTAINS $honeyaccount
+
+condition:
+$1 or $2 or $3 or $4
