@@ -3,9 +3,11 @@ $1:
 index=Windows_Event_Logs and EventID=5140 | match ShareName=(""/\\(ADMIN\$$/i") | rare(Computer) by IpAddress compared to self;
 $2:
 index=Windows_Event_Logs and EventID=5145 and ShareName=match(""/\\(ADMIN\$$/i") | match RelativeTargetName=("/*PSEXESVC.EXE*/" or match RelativeTargetName=("/*paexec*/i")) | rare(Computer) by IpAddress compared to self;
-$2: 
+$3: 
 index=Windows_Event_Logs and EventID=7045 | match ImagePath="/*PSEXESVC\.EXE$/" or match ImagePath="/*\\paexec-*.exe */i")
-$3:
+$4:
 index=Windows_Event_Logs and EventID=4688 | match NewProcessName="/*PSEXESVC\.EXE$/" or match NewProcessName="/*paexec*\.EXE/i")
+$5: index=Windows_Event_Logs and EventID=5140 and User!="*\$" and match ShareName="/\\(?:ADMIN\$|IPC\$|[C-Z]{1}\$)$/i" and IpAddress!="::1" and IpAddress!="127.0.0.1"| rare by IpAddress;
+$6: resourcegroupname=Windows_Event_Logs and EventID=5140 and User!="*\$" and match ShareName="/\\(?:ADMIN\$|IPC\$|[C-Z]{1}\$)$/i" and IpAddress!="::1" and IpAddress!="127.0.0.1"| high(distinct(Hostname)) by IpAddress compared to self period 1h;
 condition:
-($1 or $2) or $3 or $4
+($1 or $2) or $3 or $4 or $5 or $6
