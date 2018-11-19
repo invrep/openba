@@ -1,0 +1,11 @@
+### Behavior-based, openba
+$1:
+index=Windows_Event_Logs and EventID=5140 | match ShareName=(""/\\(ADMIN\$$/i") | rare(Computer) by IpAddress compared to self;
+$2:
+index=Windows_Event_Logs and EventID=5145 and ShareName=match(""/\\(ADMIN\$$/i") | match RelativeTargetName=("/*PSEXESVC.EXE*/" or match RelativeTargetName=("/*paexec*/i")) | rare(Computer) by IpAddress compared to self;
+$2: 
+index=Windows_Event_Logs and EventID=7045 | match ImagePath="/*PSEXESVC\.EXE$/" or match ImagePath="/*\\paexec-*.exe */i")
+$3:
+index=Windows_Event_Logs and EventID=4688 | match NewProcessName="/*PSEXESVC\.EXE$/" or match NewProcessName="/*paexec*\.EXE/i")
+condition:
+($1 or $2) or $3 or $4
